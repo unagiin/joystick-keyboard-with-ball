@@ -1,0 +1,12 @@
+file_format: "1"
+id: joyball42
+name: Joyball42
+type: shield
+url: ""
+requires: [pro_micro]
+features:
+  - keys
+  - pointer
+siblings:
+  - joyball42_left
+  - joyball42_right

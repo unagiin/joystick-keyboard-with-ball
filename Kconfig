@@ -1,0 +1,14 @@
+config ZMK_KSCAN_JOYSTICK
+    bool "Analog stick as virtual kscan keys"
+    default y
+    depends on DT_HAS_ZMK_KSCAN_JOYSTICK_ENABLED
+    select ADC
+    select KSCAN
+
+if ZMK_KSCAN_JOYSTICK
+
+module = ZMK_KSCAN_JOYSTICK
+module-str = zmk_kscan_joystick
+source "subsys/logging/Kconfig.template.log_config"
+
+endif

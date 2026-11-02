@@ -1,0 +1,17 @@
+if SHIELD_JOYBALL42_RIGHT
+
+# The trackball sits on the central so aiming skips the split link.
+config ZMK_KEYBOARD_NAME
+    default "Joyball42"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif
+
+if SHIELD_JOYBALL42_LEFT || SHIELD_JOYBALL42_RIGHT
+
+config ZMK_SPLIT
+    default y
+
+endif

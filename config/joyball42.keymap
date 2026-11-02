@@ -1,0 +1,176 @@
+/*
+ * Position order in every layer:
+ *   rows 0-3 : 6 left + 6 right
+ *   thumb    : L41 L44 L45   R45 R44 R41
+ *   stick    : up left down right click
+ *   toggles  : A B (latching switches on the right half; only Base binds them, every other
+ *              layer is transparent so that a switch always releases what it pressed)
+ *
+ * This file sets the defaults. Day to day edits are easier in ZMK Studio, see README.md.
+ * User1 and User2 are blank layers kept for Studio, which cannot add layers of its own.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <input/processors.dtsi>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/pointing.h>
+
+#define BASE 0
+#define GAME 1
+#define ARROW 2
+#define NUM 3
+#define SYM 4
+#define SYS 5
+#define USER1 6
+#define USER2 7
+#define MOUSE 8
+#define SCROLL 9
+
+&mt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <200>;
+};
+
+&lt {
+    flavor = "balanced";
+    tapping-term-ms = <200>;
+};
+
+&trackball_listener {
+    input-processors = <&zip_temp_layer MOUSE 600>;
+
+    scroller {
+        layers = <SCROLL>;
+        input-processors = <&zip_xy_scaler 1 8>, <&zip_xy_to_scroll_mapper>;
+    };
+};
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        base {
+            display-name = "Base";
+            bindings = <
+    &kp GRAVE  &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &kp N6 &kp N7 &kp N8    &kp N9  &kp N0   &kp MINUS
+    &kp ESC    &kp Q &kp W &kp E &kp R &kp T      &kp Y &kp U &kp I     &kp O   &kp P    &kp BSPC
+    &kp TAB    &kp A &kp S &kp D &kp F &kp G      &kp H &kp J &kp K     &kp L   &kp SEMI &kp SQT
+    &kp LSHFT  &kp Z &kp X &kp C &kp V &kp B      &kp N &kp M &kp COMMA &kp DOT &kp FSLH &kp RSHFT
+    &kp LCTRL  &lt NUM LANG2  &lt SYM SPACE       &lt SYM ENTER  &lt NUM LANG1  &mo SCROLL
+    &kp W &kp A &kp S &kp D  &kp LSHFT   &mo GAME &mo ARROW
+            >;
+        };
+
+        game {
+            display-name = "Game";
+            bindings = <
+    &kp ESC    &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &trans &trans &trans &trans &trans &mo SYS
+    &kp TAB    &kp Q  &kp E  &kp R  &kp F  &kp G      &trans &trans &trans &trans &trans &trans
+    &kp LCTRL  &kp H  &kp J  &kp K  &kp L  &kp M      &trans &mkp LCLK &mkp RCLK &mkp MCLK &trans &trans
+    &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B      &trans &trans &trans &trans &trans &trans
+    &kp LCTRL  &kp SPACE  &kp LALT                    &mkp LCLK  &mkp RCLK  &mo SCROLL
+    &trans &trans &trans &trans  &trans   &trans &trans
+            >;
+        };
+
+        arrow {
+            display-name = "Arrow";
+            bindings = <
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans  &trans  &trans                      &trans  &trans  &trans
+    &kp UP &kp LEFT &kp DOWN &kp RIGHT  &trans   &trans &trans
+            >;
+        };
+
+        num {
+            display-name = "Num";
+            bindings = <
+    &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6     &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12
+    &trans &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &kp N6   &kp N7   &kp N8 &kp N9    &kp N0  &trans
+    &trans &trans &trans &trans &trans &trans     &kp LEFT &kp DOWN &kp UP &kp RIGHT &trans  &trans
+    &trans &trans &trans &trans &trans &trans     &kp HOME &kp PG_DN &kp PG_UP &kp END &kp DEL &trans
+    &trans  &trans  &mo SYS                       &mo SYS  &trans  &trans
+    &kp UP &kp LEFT &kp DOWN &kp RIGHT  &trans   &trans &trans
+            >;
+        };
+
+        sym {
+            display-name = "Sym";
+            bindings = <
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &kp EXCL &kp AT &kp HASH &kp DLLR &kp PRCNT   &kp CARET &kp AMPS &kp STAR &kp LPAR &kp RPAR &trans
+    &trans &kp GRAVE &kp TILDE &kp MINUS &kp EQUAL &kp BSLH   &kp UNDER &kp PLUS &kp LBKT &kp RBKT &kp LBRC &kp RBRC
+    &trans &trans &trans &trans &trans &kp PIPE   &trans &trans &trans &trans &trans &trans
+    &trans  &mo SYS  &trans                       &trans  &mo SYS  &trans
+    &trans &trans &trans &trans  &trans   &trans &trans
+            >;
+        };
+
+        sys {
+            display-name = "System";
+            bindings = <
+    &studio_unlock &none &none &none &none &none                                   &none &none &none &none &none &none
+    &bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &tog GAME &none &none &none &none &sys_reset
+    &none &none &none &none &none &none                                            &none &none &none &none &none &bootloader
+    &bootloader &none &none &none &none &none                                      &none &none &none &none &none &none
+    &sys_reset  &trans  &trans                                                     &trans  &trans  &none
+    &none &none &none &none  &none   &trans &trans
+            >;
+        };
+
+        user1 {
+            display-name = "User1";
+            bindings = <
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans  &trans  &trans                      &trans  &trans  &trans
+    &trans &trans &trans &trans  &trans   &trans &trans
+            >;
+        };
+
+        user2 {
+            display-name = "User2";
+            bindings = <
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans  &trans  &trans                      &trans  &trans  &trans
+    &trans &trans &trans &trans  &trans   &trans &trans
+            >;
+        };
+
+        mouse {
+            display-name = "Mouse";
+            bindings = <
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &mkp LCLK &mkp RCLK &mkp MCLK &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans  &trans  &trans                      &trans  &trans  &trans
+    &trans &trans &trans &trans  &trans   &trans &trans
+            >;
+        };
+
+        scroll {
+            display-name = "Scroll";
+            bindings = <
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
+    &trans  &trans  &trans                      &trans  &trans  &trans
+    &trans &trans &trans &trans  &trans   &trans &trans
+            >;
+        };
+    };
+};

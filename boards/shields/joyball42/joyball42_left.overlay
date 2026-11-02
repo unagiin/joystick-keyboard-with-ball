@@ -1,0 +1,89 @@
+/*
+ * Left half: peripheral with the analog stick.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include "joyball42.dtsi"
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/adc/nrf-adc.h>
+
+&adc {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    status = "okay";
+
+    /* 2.4 V full scale fits the 1.8 V stick supply. */
+    stick_x: channel@5 {
+        reg = <5>;
+        zephyr,gain = "ADC_GAIN_1_4";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)>;
+        zephyr,input-positive = <NRF_SAADC_AIN5>; /* P0.29 = D20 */
+        zephyr,resolution = <12>;
+    };
+
+    stick_y: channel@7 {
+        reg = <7>;
+        zephyr,gain = "ADC_GAIN_1_4";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)>;
+        zephyr,input-positive = <NRF_SAADC_AIN7>; /* P0.31 = D21 */
+        zephyr,resolution = <12>;
+    };
+};
+
+/ {
+    chosen {
+        zmk,kscan = &kscan_composite;
+    };
+
+    /* Mounted turned 180 degrees so the ribbon exits away from the thumb keys. */
+    kscan_stick: kscan_stick {
+        compatible = "zmk,kscan-joystick";
+        io-channels = <&adc 5>, <&adc 7>;
+        io-channel-names = "x", "y";
+        enable-gpios = <&pro_micro 19 GPIO_ACTIVE_HIGH>;
+        invert-x;
+        invert-y;
+    };
+
+    kscan_click: kscan_click {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+        input-gpios = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+
+    kscan_composite: kscan_composite {
+        compatible = "zmk,kscan-composite";
+        rows = <6>;
+        columns = <6>;
+        wakeup-source;
+
+        matrix {
+            kscan = <&kscan_matrix>;
+        };
+
+        stick {
+            kscan = <&kscan_stick>;
+            row-offset = <5>;
+        };
+
+        click {
+            kscan = <&kscan_click>;
+            row-offset = <5>;
+            col-offset = <4>;
+        };
+    };
+};
+
+&kscan_matrix {
+    col-gpios
+        = <&pro_micro 9 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 8 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 7 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 6 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 5 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 4 GPIO_ACTIVE_HIGH>
+        ;
+};

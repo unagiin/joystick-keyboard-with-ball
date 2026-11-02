@@ -1,0 +1,108 @@
+/*
+ * Right half: central with the PMW3610 trackball.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include "joyball42.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+&default_transform {
+    col-offset = <6>;
+};
+
+/ {
+    chosen {
+        zmk,kscan = &kscan_composite;
+    };
+
+    /*
+     * Latching layer toggles. Deliberately not a wakeup source: a switch left closed would hold
+     * its pin active and wake the board straight out of sleep.
+     */
+    kscan_toggles: kscan_toggles {
+        compatible = "zmk,kscan-gpio-direct";
+        input-gpios
+            = <&pro_micro 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&pro_micro 10 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            ;
+    };
+
+    kscan_composite: kscan_composite {
+        compatible = "zmk,kscan-composite";
+        rows = <6>;
+        columns = <6>;
+        wakeup-source;
+
+        matrix {
+            kscan = <&kscan_matrix>;
+        };
+
+        toggles {
+            kscan = <&kscan_toggles>;
+            row-offset = <5>;
+        };
+    };
+};
+
+/* Column 0 is the inner column, so the right half reads left to right like the left half. */
+&kscan_matrix {
+    col-gpios
+        = <&pro_micro 4 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 5 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 6 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 7 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 8 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 9 GPIO_ACTIVE_HIGH>
+        ;
+};
+
+&pinctrl {
+    spi0_default: spi0_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,  /* D21 */
+                    <NRF_PSEL(SPIM_MOSI, 0, 29)>, /* D20: SDIO is one shared data line */
+                    <NRF_PSEL(SPIM_MISO, 0, 29)>;
+        };
+    };
+
+    spi0_sleep: spi0_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 31)>,
+                    <NRF_PSEL(SPIM_MOSI, 0, 29)>,
+                    <NRF_PSEL(SPIM_MISO, 0, 29)>;
+            low-power-enable;
+        };
+    };
+};
+
+/* SPI0 and TWI0 share one peripheral on the nRF52840. */
+&i2c0 {
+    status = "disabled";
+};
+
+&spi0 {
+    status = "okay";
+    compatible = "nordic,nrf-spim";
+    pinctrl-0 = <&spi0_default>;
+    pinctrl-1 = <&spi0_sleep>;
+    pinctrl-names = "default", "sleep";
+    cs-gpios = <&pro_micro 19 GPIO_ACTIVE_LOW>;
+
+    trackball: trackball@0 {
+        status = "okay";
+        compatible = "pixart,pmw3610";
+        reg = <0>;
+        spi-max-frequency = <2000000>;
+        irq-gpios = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        cpi = <800>;
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
+    };
+};
+
+&trackball_listener {
+    status = "okay";
+    device = <&trackball>;
+};

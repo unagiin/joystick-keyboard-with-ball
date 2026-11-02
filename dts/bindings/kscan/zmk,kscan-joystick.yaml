@@ -1,0 +1,107 @@
+description: |
+  Analog stick read through the ADC and reported as four kscan keys in one row.
+  Columns are 0 up, 1 left, 2 down, 3 right.
+
+  ADC values below assume the nRF52840 SAADC at 12 bit with the 0.6 V internal
+  reference and gain 1/4, so 2.4 V full scale and about 1706 counts per volt.
+
+compatible: "zmk,kscan-joystick"
+
+include: kscan.yaml
+
+properties:
+  io-channels:
+    type: phandle-array
+    required: true
+    description: X and Y ADC channels.
+
+  io-channel-names:
+    type: string-array
+    required: true
+    description: Must be "x" and "y".
+
+  enable-gpios:
+    type: phandle-array
+    required: true
+    description: Enable pin of the regulator that powers the stick.
+
+  press-threshold:
+    type: int
+    default: 340
+    description: Radial distance from centre, in counts, at which keys engage.
+
+  release-threshold:
+    type: int
+    default: 240
+    description: Radial distance from centre, in counts, at which keys release.
+
+  on-ratio-permille:
+    type: int
+    default: 520
+    description: |
+      Minor/major axis ratio at which the minor axis key turns on. 414 gives eight
+      equal 45 degree sectors; higher values make diagonals narrower.
+
+  off-ratio-permille:
+    type: int
+    default: 330
+    description: Ratio at which that key turns off again. Must be below on-ratio-permille.
+
+  swap-xy:
+    type: boolean
+
+  invert-x:
+    type: boolean
+
+  invert-y:
+    type: boolean
+
+  recenter-after-samples:
+    type: int
+    default: 400
+    description: Samples at rest before the centre follows drift. 0 disables tracking.
+
+  active-period-ms:
+    type: int
+    default: 4
+    description: Sampling period while the stick is in use.
+
+  idle-period-ms:
+    type: int
+    default: 12
+    description: Sampling period once the stick has been at rest for a while.
+
+  idle-after-samples:
+    type: int
+    default: 500
+    description: Samples at rest before dropping to idle-period-ms.
+
+  settle-ms:
+    type: int
+    default: 20
+    description: Wait after enabling the regulator before the first ADC read.
+
+  calibration-samples:
+    type: int
+    default: 32
+    description: Samples averaged to find the centre.
+
+  calibration-retry-ms:
+    type: int
+    default: 1000
+    description: Wait before retrying a rejected calibration.
+
+  center-min:
+    type: int
+    default: 800
+    description: Lowest plausible resting value. Anything lower rejects the calibration.
+
+  center-max:
+    type: int
+    default: 2300
+    description: Highest plausible resting value. Anything higher rejects the calibration.
+
+  calibration-max-spread:
+    type: int
+    default: 60
+    description: Largest allowed peak to peak noise while calibrating.
