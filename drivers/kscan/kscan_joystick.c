@@ -319,7 +319,7 @@ static const struct kscan_driver_api joystick_api = {
         .x = ADC_DT_SPEC_STRUCT(DT_IO_CHANNELS_CTLR_BY_NAME(DT_DRV_INST(n), x),                    \
                                 DT_IO_CHANNELS_INPUT_BY_NAME(DT_DRV_INST(n), x)),                  \
         .y = ADC_DT_SPEC_STRUCT(DT_IO_CHANNELS_CTLR_BY_NAME(DT_DRV_INST(n), y),                    \
-                                DT_IO_CHANNELS_INPUT_BY_NAME(DT_DRV_INST(n), y)),                  \                                        \
+                                DT_IO_CHANNELS_INPUT_BY_NAME(DT_DRV_INST(n), y)),                  \                                       \
         .enable = GPIO_DT_SPEC_INST_GET(n, enable_gpios),                                          \
         .logic =                                                                                   \
             {                                                                                      \
