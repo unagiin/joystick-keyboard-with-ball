@@ -316,8 +316,10 @@ static const struct kscan_driver_api joystick_api = {
                  "release-threshold must be below press-threshold");                               \
     static struct joystick_data joystick_data_##n;                                                 \
     static const struct joystick_config joystick_config_##n = {                                    \
-        .x = ADC_DT_SPEC_GET_BY_NAME(DT_DRV_INST(n), x),                                           \
-        .y = ADC_DT_SPEC_GET_BY_NAME(DT_DRV_INST(n), y),                                           \
+        .x = ADC_DT_SPEC_STRUCT(DT_IO_CHANNELS_CTLR_BY_NAME(DT_DRV_INST(n), x),                    \
+                                DT_IO_CHANNELS_INPUT_BY_NAME(DT_DRV_INST(n), x)),                  \
+        .y = ADC_DT_SPEC_STRUCT(DT_IO_CHANNELS_CTLR_BY_NAME(DT_DRV_INST(n), y),                    \
+                                DT_IO_CHANNELS_INPUT_BY_NAME(DT_DRV_INST(n), y)),                  \                                        \
         .enable = GPIO_DT_SPEC_INST_GET(n, enable_gpios),                                          \
         .logic =                                                                                   \
             {                                                                                      \
