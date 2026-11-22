@@ -96,6 +96,10 @@
         spi-max-frequency = <2000000>;
         irq-gpios = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
         cpi = <800>;
+        /* Module as mounted: ball right read as up, ball up as right. */
+        swap-xy;
+        invert-x;
+        invert-y;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
