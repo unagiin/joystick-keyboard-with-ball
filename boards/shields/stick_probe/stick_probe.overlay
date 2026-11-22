@@ -1,0 +1,50 @@
+/*
+ * Temporary firmware that turns the left half into a two-wire resistance probe.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/adc/nrf-adc.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+    chosen {
+        zmk,kscan = &probe_kscan;
+    };
+
+    /* ZMK needs a kscan. This one never reports a key. */
+    probe_kscan: probe_kscan {
+        compatible = "zmk,kscan-mock";
+        columns = <1>;
+        rows = <0>;
+        events = <>;
+    };
+
+    zephyr,user {
+        io-channels = <&adc 7>;
+        probe-gpios = <&gpio0 31 GPIO_ACTIVE_HIGH>;    /* S2, wire A */
+        ldo-en-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;    /* U2 enable, held low */
+    };
+};
+
+&adc {
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    /* Both the pull-up and the full scale follow VDD, so the reading is ratiometric. */
+    channel@7 {
+        reg = <7>;
+        zephyr,gain = "ADC_GAIN_1_4";
+        zephyr,reference = "ADC_REF_VDD_1_4";
+        zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)>;
+        zephyr,input-positive = <NRF_SAADC_AIN7>;
+        zephyr,resolution = <12>;
+    };
+};
+
+&zephyr_udc0 {
+    probe_uart: probe_uart {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};

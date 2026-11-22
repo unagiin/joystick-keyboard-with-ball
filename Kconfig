@@ -12,3 +12,8 @@ module-str = zmk_kscan_joystick
 source "subsys/logging/Kconfig.template.log_config"
 
 endif
+
+config JOYBALL42_STICK_PROBE
+    bool "Temporary stick pin-out probe"
+    default y
+    depends on SHIELD_STICK_PROBE

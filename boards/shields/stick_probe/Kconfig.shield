@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT
+
+# Not named joyball42_*: ZMK would then load config/joyball42.keymap and .conf for it.
+config SHIELD_STICK_PROBE
+    def_bool $(shields_list_contains,stick_probe)

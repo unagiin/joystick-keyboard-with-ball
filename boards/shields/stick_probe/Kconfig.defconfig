@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+
+if SHIELD_STICK_PROBE
+
+config ZMK_KEYBOARD_NAME
+    default "Stick Probe"
+
+endif
