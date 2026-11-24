@@ -6,6 +6,16 @@
  *   toggles  : A B (latching switches on the right half; only Base binds them, every other
  *              layer is transparent so that a switch always releases what it pressed)
  *
+ * 2026-11-24: rewritten after the user's KillerWhale DUO keymap (Remap cheat sheet), with the
+ * same key codes. The user's PC uses the Japanese (JIS) layout, so the codes are copied as
+ * they are, not as the English legends on the cheat sheet suggest (GRAVE is 半角/全角, LBKT is @).
+ * KillerWhale layer -> here: 0 Base, 1 Shift, 3 Game1 (toggle A), 4 Game2 (toggle B),
+ * 5 Game3 (held from Game2), 7 Fn. Layers 2, 6, 8 (ball settings) and 9 (RGB) are not used.
+ * The previous keymap is kept as joyball42.keymap.before_killerwhale.
+ *
+ * The stick is not connected yet and its floating inputs read as "pushed right", so every
+ * stick position is &none for now. The intended bindings are in the comment of each layer.
+ *
  * This file sets the defaults. Day to day edits are easier in ZMK Studio, see README.md.
  * User1 and User2 are blank layers kept for Studio, which cannot add layers of its own.
  *
@@ -20,15 +30,16 @@
 #include <dt-bindings/zmk/pointing.h>
 
 #define BASE 0
-#define GAME 1
-#define ARROW 2
-#define NUM 3
-#define SYM 4
-#define SYS 5
-#define USER1 6
-#define USER2 7
-#define MOUSE 8
-#define SCROLL 9
+#define SHIFT 1
+#define GAME1 2
+#define GAME2 3
+#define GAME3 4
+#define FN 5
+#define SYS 6
+#define USER1 7
+#define USER2 8
+#define MOUSE 9
+#define SCROLL 10
 
 &mt {
     flavor = "tap-preferred";
@@ -53,74 +64,102 @@
     keymap {
         compatible = "zmk,keymap";
 
+        /* KillerWhale layer 0. Win (under X) moved to the top left, ] (right thumb) to the top
+         * right, \ to the right outer thumb (hold: scroll with the ball). Insert is on Fn.
+         * Stick later: UP LEFT DOWN RIGHT ENTER. */
         base {
             display-name = "Base";
             bindings = <
-    &kp GRAVE  &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &kp N6 &kp N7 &kp N8    &kp N9  &kp N0   &kp MINUS
-    &kp ESC    &kp Q &kp W &kp E &kp R &kp T      &kp Y &kp U &kp I     &kp O   &kp P    &kp BSPC
-    &kp TAB    &kp A &kp S &kp D &kp F &kp G      &kp H &kp J &kp K     &kp L   &kp SEMI &kp SQT
-    &kp LSHFT  &kp Z &kp X &kp C &kp V &kp B      &kp N &kp M &kp COMMA &kp DOT &kp FSLH &kp RSHFT
-    &kp LCTRL  &lt NUM LANG2  &lt SYM SPACE       &lt SYM ENTER  &lt NUM LANG1  &mo SCROLL
-    &kp W &kp A &kp S &kp D  &kp LSHFT   &mo GAME &mo ARROW
+    &kp LGUI           &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &kp N6 &kp N7 &kp N8 &kp N9    &kp N0   &kp RBKT
+    &mt LSHFT ESC      &kp Q  &kp W  &kp E  &kp R  &kp T      &kp Y  &kp U  &kp I  &kp O     &kp P    &kp MINUS
+    &kp TAB            &kp A  &kp S  &kp D  &kp F  &kp G      &kp H  &kp J  &kp K  &lt FN L  &kp SEMI &kp INT_YEN
+    &mt LCTRL GRAVE    &kp Z  &kp X  &kp C  &kp V  &kp B      &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &kp SQT
+    &kp LALT  &mo FN  &lt SHIFT SPACE                         &kp BSPC  &kp ENTER  &lt SCROLL BSLH
+    &none &none &none &none  &none   &mo GAME1 &mo GAME2
             >;
         };
 
-        game {
-            display-name = "Game";
+        /* KillerWhale layer 1 (held with the Space thumb): shifted keys, with the number row
+         * giving the US symbols on a JIS PC. Stick later: LS(UP) LS(LEFT) LS(DOWN) LS(RIGHT). */
+        shift {
+            display-name = "Shift";
             bindings = <
-    &kp ESC    &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &trans &trans &trans &trans &trans &mo SYS
-    &kp TAB    &kp Q  &kp E  &kp R  &kp F  &kp G      &trans &trans &trans &trans &trans &trans
-    &kp LCTRL  &kp H  &kp J  &kp K  &kp L  &kp M      &trans &mkp LCLK &mkp RCLK &mkp MCLK &trans &trans
-    &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B      &trans &trans &trans &trans &trans &trans
-    &kp LCTRL  &kp SPACE  &kp LALT                    &mkp LCLK  &mkp RCLK  &mo SCROLL
-    &trans &trans &trans &trans  &trans   &trans &trans
+    &kp LS(LGUI)   &kp LS(N1) &kp LBKT  &kp LS(N3) &kp LS(N4) &kp LS(N5)     &kp EQUAL  &kp LS(N6) &kp LS(SQT) &kp LS(N8) &kp LS(N9) &kp LS(RBKT)
+    &kp LS(ESC)    &kp LS(Q)  &kp LS(W) &kp LS(E)  &kp LS(R)  &kp LS(T)      &kp LS(Y)  &kp LS(U)  &kp LS(I)   &kp LS(O)  &kp LS(P)  &kp LS(INT_RO)
+    &kp LS(TAB)    &kp LS(A)  &kp LS(S) &kp LS(D)  &kp LS(F)  &kp LS(G)      &kp LS(H)  &kp LS(J)  &kp LS(K)   &kp LS(L)  &kp LS(N7) &kp LS(MINUS)
+    &kp LS(LCTRL)  &kp LS(Z)  &kp LS(X) &kp LS(C)  &kp LS(V)  &kp LS(B)      &kp LS(N)  &kp LS(M)  &kp LS(COMMA) &kp LS(DOT) &kp LS(FSLH) &kp LS(N2)
+    &none  &none  &trans                                                     &kp LS(SPACE)  &kp LS(ENTER)  &kp LS(BSLH)
+    &none &none &none &none  &none   &trans &trans
             >;
         };
 
-        arrow {
-            display-name = "Arrow";
+        /* KillerWhale layer 3, now on toggle A. Its two "Macro 0" keys are &none (the macro's
+         * content is not on the cheat sheet). Stick later: W A S D F7. */
+        game1 {
+            display-name = "Game1";
             bindings = <
-    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
-    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
-    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
-    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
-    &trans  &trans  &trans                      &trans  &trans  &trans
-    &kp UP &kp LEFT &kp DOWN &kp RIGHT  &trans   &trans &trans
+    &kp LALT   &kp N1 &kp N2 &kp N3 &kp N4    &kp N5      &none &none &none &none &none &none
+    &kp ESC    &kp E  &kp F  &kp G  &kp LSHFT &none       &none &none &none &none &none &none
+    &kp TAB    &kp F2 &kp F1 &kp G  &kp B     &kp F6      &none &none &none &none &kp LS(INT_YEN) &none
+    &kp SPACE  &none  &kp F1 &kp F3 &kp F4    &kp F5      &none &none &kp RBKT &kp BSLH &none &none
+    &kp M  &kp TAB  &kp F7                                &none  &none  &none
+    &none &none &none &none  &none   &trans &trans
             >;
         };
 
-        num {
-            display-name = "Num";
+        /* KillerWhale layer 4, now on toggle B. Right inner thumb holds Game3 (its MO(5)), the
+         * next thumb is its Shift+9. Stick later: W A S D F1. */
+        game2 {
+            display-name = "Game2";
             bindings = <
-    &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6     &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12
-    &trans &kp N1 &kp N2 &kp N3 &kp N4 &kp N5     &kp N6   &kp N7   &kp N8 &kp N9    &kp N0  &trans
-    &trans &trans &trans &trans &trans &trans     &kp LEFT &kp DOWN &kp UP &kp RIGHT &trans  &trans
-    &trans &trans &trans &trans &trans &trans     &kp HOME &kp PG_DN &kp PG_UP &kp END &kp DEL &trans
-    &trans  &trans  &mo SYS                       &mo SYS  &trans  &trans
-    &kp UP &kp LEFT &kp DOWN &kp RIGHT  &trans   &trans &trans
+    &kp LALT   &kp N1 &kp N2 &kp N3 &kp N4 &kp N5      &kp N6 &kp N7 &kp N8 &kp N9 &kp N0 &none
+    &kp ESC    &kp E  &kp F  &kp G  &kp R  &kp T       &kp Y  &none  &none  &none  &none  &none
+    &kp LCTRL  &kp H  &kp K  &kp G  &kp B  &kp J       &none  &none  &none  &none  &none  &none
+    &kp SPACE  &kp Z  &kp X  &kp C  &kp V  &kp N       &none  &none  &none  &none  &none  &none
+    &kp M  &kp TAB  &kp F7                             &mo GAME3  &kp LS(N9)  &none
+    &none &none &none &none  &none   &trans &trans
             >;
         };
 
-        sym {
-            display-name = "Sym";
+        /* KillerWhale layer 5 (held from Game2): plain typing. Alt on the top left, Shift on the
+         * outer left thumb; Win and Insert are left out. Stick later: W A S D. */
+        game3 {
+            display-name = "Game3";
             bindings = <
-    &trans &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &trans
-    &trans &kp EXCL &kp AT &kp HASH &kp DLLR &kp PRCNT   &kp CARET &kp AMPS &kp STAR &kp LPAR &kp RPAR &trans
-    &trans &kp GRAVE &kp TILDE &kp MINUS &kp EQUAL &kp BSLH   &kp UNDER &kp PLUS &kp LBKT &kp RBKT &kp LBRC &kp RBRC
-    &trans &trans &trans &trans &trans &kp PIPE   &trans &trans &trans &trans &trans &trans
-    &trans  &mo SYS  &trans                       &trans  &mo SYS  &trans
-    &trans &trans &trans &trans  &trans   &trans &trans
+    &kp LALT   &kp N1 &kp N2 &kp N3 &kp N4 &kp N5      &kp N6 &kp N7 &kp N8 &kp N9    &kp N0   &none
+    &gresc     &kp Q  &kp W  &kp E  &kp R  &kp T       &kp Y  &kp U  &kp I  &kp O     &kp P    &kp MINUS
+    &kp TAB    &kp A  &kp S  &kp D  &kp F  &kp G       &kp H  &kp J  &kp K  &kp L     &kp SEMI &kp INT_YEN
+    &kp LCTRL  &kp Z  &kp X  &kp C  &kp V  &kp B       &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &kp SQT
+    &kp LSHFT  &mo FN  &kp SPACE                       &trans  &kp ENTER  &kp BSPC
+    &none &none &none &none  &none   &trans &trans
             >;
         };
 
+        /* KillerWhale layer 7 (held with the left middle thumb): F keys, numpad, mouse buttons.
+         * Home moved to the top right, End to the right outer thumb, Insert next to Mouse 5.
+         * "Scroll Mode" holds the scroll layer. System is new: while holding Fn, hold
+         * the O key position. Stick later: UP LEFT DOWN RIGHT. */
+        fn {
+            display-name = "Fn";
+            bindings = <
+    &kp KP_N0  &kp F1     &kp F2    &kp F3    &kp F4    &kp F5            &kp F6      &kp F7      &kp F8      &kp F9    &kp F10  &kp HOME
+    &kp ESC    &none      &kp KP_N7 &kp KP_N8 &kp KP_N9 &kp KP_SLASH      &mkp MB5    &kp INS     &none       &mo SYS   &none    &kp F11
+    &none      &kp KP_PLUS &kp KP_N4 &kp KP_N5 &kp KP_N6 &kp KP_MULTIPLY  &mo SCROLL  &mkp LCLK   &mkp RCLK   &none     &kp BSLH &kp LS(SEMI)
+    &kp LCTRL  &kp KP_DOT &kp KP_N1 &kp KP_N2 &kp KP_N3 &kp KP_MINUS      &mkp MB4    &none       &mkp MCLK   &kp RBKT  &none    &kp LS(INT_YEN)
+    &kp LC(LALT)  &trans  &kp KP_PLUS                                     &kp DEL  &kp C_MUTE  &kp END
+    &none &none &none &none  &none   &trans &trans
+            >;
+        };
+
+        /* Not on the KillerWhale. Top left: unlock ZMK Studio. Mind BT_CLR just below it. */
         sys {
             display-name = "System";
             bindings = <
     &studio_unlock &none &none &none &none &none                                   &none &none &none &none &none &none
-    &bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &tog GAME &none &none &none &none &sys_reset
+    &bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &none &none &none &trans &none &sys_reset
     &none &none &none &none &none &none                                            &none &none &none &none &none &bootloader
     &bootloader &none &none &none &none &none                                      &none &none &none &none &none &none
-    &sys_reset  &trans  &trans                                                     &trans  &trans  &none
+    &sys_reset  &trans  &none                                                      &none  &none  &none
     &none &none &none &none  &none   &trans &trans
             >;
         };
@@ -149,6 +188,7 @@
             >;
         };
 
+        /* Turns on by itself for 600 ms while the ball moves. */
         mouse {
             display-name = "Mouse";
             bindings = <
